@@ -10,59 +10,32 @@ import {
   Button,
 } from "react-native";
 import Constants from "expo-constants";
-import { Buffer } from "buffer";
 
 import { Audio } from "expo-av";
-import axios from "axios";
 import * as FileSystem from 'expo-file-system';
-import * as Sharing from "expo-sharing";
+import VoiceApiInstance from "../api/say";
 
+interface Receipe {
+  ingredients: string[]
+  steps: string[]
+}
 
 export default function Prompter() {
-  const [inputText, setInputText] = useState("");
-  const [apiResponse, setApiResponse] = useState("");
+
+  const [narration, setNarration] = useState(false);
+  const [receipe, setReceipe] = useState<Receipe>(null);
+
   const scrollViewRef = useRef<ScrollView>(null);
-
-  const [audioBlob, setAudioBlob] = useState(null);
-
   const openApiKey = Constants.expoConfig.extra.openApiKey;
-  const elevenLabsApiKey = Constants.expoConfig.extra.elevenLabsApiKey;
 
   const prompt =
-    "Act like a famous Indian chef and generate a biryani receipe. Breakdown the receipt into steps";
-  const [textToSpeak, setTextToSpeak] = useState("");
-  const [audioURL, setAudioURL] = useState("");
+    "Act like the most famous Chef." + 
+    "\nTopic: Food and Nutrition" +
+    "\nContext: Cooking food at home that is nutritious, cheaper and easy to prepare" +
+    "\nTask: Write a recipe of chicken biryani that is traditional and tasty. Respons should be in two sections, first section will contain ingredients and then second will contain steps to prepare the Biryani" +
+    "\nConstraints:  Make it simple and clear" + 
+    "\nAdditional prompts: Create a response in a  json. The json should match the following json structure. { \"ingredients\": [], \"steps\": [] }";
 
-  const fetchBlob = async () => {
-    const response = await axios(
-      `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream`,
-      {
-        method: "POST",
-        headers: {
-          accept: "audio/mpeg",
-          'xi-api-key': elevenLabsApiKey,
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify({
-          text: textToSpeak,
-          voice_settings: {
-            stability: 0,
-            similarity_boost: 0,
-          },
-        }),
-        responseType: 'arraybuffer',
-      }
-    );
-
-    const buff = Buffer.from(response.data, 'base64')
-    const song = buff.toString('base64')
-
-    // const arrayBuffer = Buffer.from(response.data).toString('base64')
-    const fileUri = `${FileSystem.cacheDirectory}_chat.mp3`;
-    await FileSystem.writeAsStringAsync(fileUri, song, { encoding: FileSystem.EncodingType.Base64 });
-    await Sharing.shareAsync(fileUri);
-
-  };
 
   const play = async () => {
     const fileUri = `${FileSystem.cacheDirectory}_chat.mp3`;
@@ -71,64 +44,25 @@ export default function Prompter() {
 
     console.log('Playing Sound');
     await sound.playAsync();
-
-    // try {
-
-    //   const fileInfo = await FileSystem.getInfoAsync(FileSystem.cacheDirectory + '_chat.mp3');
-    //   // console.log(fileInfo.exists)
-    //   // const mpThree = await FileSystem.readAsStringAsync(fileInfo.uri, {
-    //   //   encoding: FileSystem.EncodingType.Base64,
-    //   // })
-
-    //   // const dataUri = `data:audio/mp3;base64,${mpThree}`;
-    //   // console.log(audioBlob)
-    //   // const uri = URL.createObjectURL(audioBlob);
-
-    //   // console.log(mpThree)
-    //   // Load the audio file from the cache directory
-    //   console.log(fileInfo.exists)
-    //   console.log(fileInfo.uri)
-
-    //   // await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-    //   const sound = new Audio.Sound();
-    //   await sound.loadAsync( {uri: `${FileSystem.cacheDirectory}_chat.mp3`});
-
-
-    //   await sound.playAsync()
-
-    //   // Play the audio file
-    //   // await sound.play();
-    // } catch (error) {
-    //   console.log(error);
-    // }
 }
 
   useEffect(() => {
-    console.log("useEffect " + textToSpeak);
-    if (textToSpeak !== "") {
-      fetchBlob()
-        // .then((response) => response.blob())
+    if (receipe) {
+      VoiceApiInstance.translate(receipe.steps[0])
         .then((response) => {
-          console.log("setting blob ");
-          // Store the blob in state
-
-          setInputText("hi");
-          // console.log(response.url)
-          // Create an object URL for the blob and store it in state
-          // setAudioBlob(response);
-      
+          setNarration(true)
         })
         .catch((error) => {
           console.error(error);
         });
     }
-  }, [textToSpeak]);
+  }, [receipe]);
 
   const handlePress = async () => {
     const requestBody: RequestBody = {
       model: "text-davinci-003",
       prompt: prompt,
-      max_tokens: 100,
+      max_tokens: 500,
       temperature: 0,
     };
 
@@ -142,11 +76,13 @@ export default function Prompter() {
     });
 
     const data: APIResponse = await response.json();
-    console.log(data);
+    const gptResponse = data.choices[0].text 
+    // console.log(data);
 
     if (response.ok) {
-      setTextToSpeak("hello");
-      setApiResponse(data.choices[0].text);
+      console.log(gptResponse)
+      const receipe: Receipe = JSON.parse(gptResponse)
+      setReceipe(receipe)
       scrollViewRef.current?.scrollTo({ y: 0.5 });
     } else {
       Alert.alert(
@@ -172,17 +108,17 @@ export default function Prompter() {
           <TouchableOpacity style={Theme.button} onPress={handlePress}>
             <Text style={Theme.buttonText}>Let's Cook</Text>
           </TouchableOpacity>
-          {apiResponse ? (
+          {receipe ? (
             <ScrollView
               ref={scrollViewRef}
               contentContainerStyle={Theme.responseContainer}
               showsVerticalScrollIndicator={false}
             >
-              <Text style={Theme.responseText}>{apiResponse}</Text>
+              <Text style={Theme.responseText}>info</Text>
             </ScrollView>
           ) : null}
 
-          {inputText ? (
+          {narration ? (
             <View>
               <Button title="play" onPress={play}/>
             </View>
