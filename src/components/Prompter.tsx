@@ -11,9 +11,8 @@ import {
 } from "react-native";
 import Constants from "expo-constants";
 
-import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-import VoiceApiInstance from "../api/voice";
+import VoiceApi from "../api/VoiceApi";
 import AudioPlayer from "./AudioPlayer";
 
 interface Receipe {
@@ -27,7 +26,7 @@ export default function Prompter() {
 
   const scrollViewRef = useRef<ScrollView>(null);
   const openApiKey = Constants.expoConfig.extra.openApiKey;
-
+  const voiceApi = new VoiceApi()
   const prompt =
     "Act like the most famous Chef." +
     "\nTopic: Food and Nutrition" +
@@ -39,13 +38,13 @@ export default function Prompter() {
   useEffect(() => {
     if (receipe) {
       console.log("generate voice");
-      VoiceApiInstance.translate(receipe.steps[0])
+      voiceApi.translate(receipe.steps[1])
         .then((response) => {
           console.log(response)
           setNarration(true);
         })
         .catch((error) => {
-          setNarration(true);
+          setNarration(false);
           console.error(error);
         });
     }
@@ -91,7 +90,7 @@ export default function Prompter() {
 
   return (
     <ImageBackground
-      source={require("../assets/kitchen.png")}
+      source={require("../../assets/kitchen.png")}
       style={Theme.background}
     >
       <View style={Theme.container}>
@@ -115,7 +114,7 @@ export default function Prompter() {
 
       <View style={Theme.container}>
         {narration ? (
-          <AudioPlayer uri={`${FileSystem.cacheDirectory}_chat.mp3`} />
+          <AudioPlayer uri={`${FileSystem.cacheDirectory}_chat2.mp3`} />
         ) : (
           <Text>Loading {narration}</Text>
         )}
