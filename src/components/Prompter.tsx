@@ -12,16 +12,16 @@ import {
 import Constants from "expo-constants";
 
 import { Audio } from "expo-av";
-import * as FileSystem from 'expo-file-system';
-import VoiceApiInstance from "../api/say";
+import * as FileSystem from "expo-file-system";
+import VoiceApiInstance from "../api/voice";
+import AudioPlayer from "./AudioPlayer";
 
 interface Receipe {
-  ingredients: string[]
-  steps: string[]
+  ingredients: string[];
+  steps: string[];
 }
 
 export default function Prompter() {
-
   const [narration, setNarration] = useState(false);
   const [receipe, setReceipe] = useState<Receipe>(null);
 
@@ -29,30 +29,23 @@ export default function Prompter() {
   const openApiKey = Constants.expoConfig.extra.openApiKey;
 
   const prompt =
-    "Act like the most famous Chef." + 
+    "Act like the most famous Chef." +
     "\nTopic: Food and Nutrition" +
     "\nContext: Cooking food at home that is nutritious, cheaper and easy to prepare" +
     "\nTask: Write a recipe of chicken biryani that is traditional and tasty. Respons should be in two sections, first section will contain ingredients and then second will contain steps to prepare the Biryani" +
-    "\nConstraints:  Make it simple and clear" + 
-    "\nAdditional prompts: Create a response in a  json. The json should match the following json structure. { \"ingredients\": [], \"steps\": [] }";
-
-
-  const play = async () => {
-    const fileUri = `${FileSystem.cacheDirectory}_chat.mp3`;
-    console.log('Loading Sound');
-    const { sound } = await Audio.Sound.createAsync( {uri: fileUri});
-
-    console.log('Playing Sound');
-    await sound.playAsync();
-}
+    "\nConstraints:  Make it simple and clear" +
+    '\nAdditional prompts: Create a response in a  json. The json should match the following json structure. { "ingredients": [], "steps": [] }';
 
   useEffect(() => {
     if (receipe) {
+      console.log("generate voice");
       VoiceApiInstance.translate(receipe.steps[0])
         .then((response) => {
-          setNarration(true)
+          console.log(response)
+          setNarration(true);
         })
         .catch((error) => {
+          setNarration(true);
           console.error(error);
         });
     }
@@ -76,13 +69,13 @@ export default function Prompter() {
     });
 
     const data: APIResponse = await response.json();
-    const gptResponse = data.choices[0].text 
+    const gptResponse = data.choices[0].text;
     // console.log(data);
 
     if (response.ok) {
-      console.log(gptResponse)
-      const receipe: Receipe = JSON.parse(gptResponse)
-      setReceipe(receipe)
+      console.log(gptResponse);
+      const receipe: Receipe = JSON.parse(gptResponse);
+      setReceipe(receipe);
       scrollViewRef.current?.scrollTo({ y: 0.5 });
     } else {
       Alert.alert(
@@ -98,12 +91,12 @@ export default function Prompter() {
 
   return (
     <ImageBackground
-      source={require("../../assets/kitchen.png")}
+      source={require("../assets/kitchen.png")}
       style={Theme.background}
     >
       <View style={Theme.container}>
         <View style={Theme.inputContainer}>
-          <Text style={Theme.heading}>Mit.ai</Text>
+          <Text style={Theme.heading}>Halw.ai</Text>
 
           <TouchableOpacity style={Theme.button} onPress={handlePress}>
             <Text style={Theme.buttonText}>Let's Cook</Text>
@@ -117,13 +110,15 @@ export default function Prompter() {
               <Text style={Theme.responseText}>info</Text>
             </ScrollView>
           ) : null}
-
-          {narration ? (
-            <View>
-              <Button title="play" onPress={play}/>
-            </View>
-          ) : null}
         </View>
+      </View>
+
+      <View style={Theme.container}>
+        {narration ? (
+          <AudioPlayer uri={`${FileSystem.cacheDirectory}_chat.mp3`} />
+        ) : (
+          <Text>Loading {narration}</Text>
+        )}
       </View>
     </ImageBackground>
   );
