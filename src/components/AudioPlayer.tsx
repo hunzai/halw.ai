@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Audio } from "expo-av";
 import { AntDesign } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system";
 
 const AudioPlayer = ({ uri }) => {
   const [isPlaying, setIsPlaying] = useState(false);

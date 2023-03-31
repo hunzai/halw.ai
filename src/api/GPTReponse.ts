@@ -1,0 +1,3 @@
+interface GPTResponse {
+  steps: string[];
+}
