@@ -17,8 +17,6 @@ const Theme = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-
-    paddingHorizontal: 30,
   },
   inputContainer: {
     width: '100%',

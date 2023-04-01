@@ -6,4 +6,3 @@ module.exports = {
         elevenLabsApiKey: process.env.ELEVEN_LABS_KEY
     },
   };
-  

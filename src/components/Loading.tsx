@@ -4,7 +4,7 @@ import { StyleSheet, View, Animated, Text } from 'react-native';
 class WaveActivityIndicator extends Component {
   state = {
     animation: new Animated.Value(0),
-    percentage: 'cooking',
+    percentage: 'gpt ...',
   };
 
   componentDidMount() {

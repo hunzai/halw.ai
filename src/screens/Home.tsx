@@ -5,19 +5,24 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Alert
+  Alert,
+  StyleSheet
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Theme from "../styles/Theme";
 import { Prompt } from "../api/Prompt";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Gpt from "../api/Gpt";
+import LocalStorage from "../utils/Storage";
+import Loading from '../components/Loading';
+
 
 function Home() {
 
-  const [gptResponse, setGptResponse] = useState<GPTResponse>(null);
+  const [textCompletion, setTextCompletion] = useState<PromptText>(null);
+  const [promptSent, setPromptSent] = useState(false)
   const navigation = useNavigation();
+
 
   const showApiError = (message: string) => {
     Alert.alert(
@@ -30,30 +35,41 @@ function Home() {
     );
   }
 
-
   useEffect(() => {
-    if (gptResponse) {
-      console.log('save to storage')
-      AsyncStorage.setItem('gpt', JSON.stringify(gptResponse)).then(value => {
-        navigation.navigate("StoryTeller")
-      })
+    if (textCompletion) {
+      console.log(textCompletion)
+      LocalStorage.set(textCompletion)
+      navigation.navigate("StoryTeller")
     }
-  }, [gptResponse]);
+  }, [textCompletion]);
 
   const sendGpt = async () => {
+    setPromptSent(true)
+
     Gpt.answer(Prompt.names()).then(response => {
-      const text = response.choices[0].text;
-      console.log(text)
-      const answer: GPTResponse = JSON.parse(JSON.stringify(text));
-      setGptResponse(answer);
+
+      console.log(`original response: ${JSON.stringify(response)}`)
+
+      const txt = JSON.stringify(response.choices[0].text)
+
+      const answer = JSON.parse(txt) as PromptText;
+      console.log(`txt: ${JSON.stringify(answer)}`)
+      setTextCompletion(answer);
+
     }).catch(error => {
       console.error('Error fetching data:', error);
       showApiError(error)
     })
   };
 
+
   return (
-    <ImageBackground
+
+    <View style={styles.container}>
+    {promptSent ? (
+      <Loading/>
+    ) : (
+      <ImageBackground
       source={require("../../assets/kitchen.png")}
       style={Theme.background}
     >
@@ -69,8 +85,20 @@ function Home() {
       </View>
 
     </ImageBackground>
+    )}
+  </View>
   );
+
+
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }});
 
 
 export default Home;

@@ -3,11 +3,11 @@ class Prompter {
 
   names() {
     const prompt =
-    "Act like algorithm that creates new names" +
-    "\nTopic: Names for male and female in Ancient world" +
-    "\nTask: Generate 3 names based on Ancient European cultures"+
-    "\nConstraints:  Generate names with max 5 characters" +
-    '\nAdditional prompts: Create a response in a json and add names to the steps array. The json should match the following json structure. { "steps": [] }';
+    'Food and Beverages' +
+    '\nTopic: Create a healthy receipe in Urdu language' +
+    '\nTask: Create a simple chicken biryani '+
+    '\nConstraints:  Keep the steps to prepare to max 10 steps' +
+    '\nAdditional prompts:  convert choices text to a json with structure { "sentences": [] }. Add recipe steps in sentences array'
 
     return prompt
   }
