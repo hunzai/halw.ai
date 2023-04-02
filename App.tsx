@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
-import Home from './src/screens/Home';
+import Home from './screens/Home';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import StoryTeller from './src/screens/StoryTeller';
+import StoryTeller from './screens/StoryTeller';
 
 const Stack = createStackNavigator();
 
