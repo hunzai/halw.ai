@@ -1,79 +1,62 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, Animated, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image, Animated, StyleSheet, Text } from 'react-native';
 
-class WaveActivityIndicator extends Component {
-  state = {
-    animation: new Animated.Value(0),
-    percentage: 'gpt ...',
+const images = [
+  require('../assets/1.png'),
+  require('../assets/2.png'),
+  require('../assets/3.png')
+];
+
+const foodFacts = ["Bananas are berries", "Carrots were purple", "Avocado is a fruit", "Lobster was prison food", "Coffee is a fruit"]
+
+const Loading = () => {
+  const [opacityAnimation] = useState(new Animated.Value(0.1)); // set initial value to 0.1
+  const [reverseAnimation, setReverseAnimation] = useState(true); // keep track of animation direction
+  const [imageIndex, setImageIndex] = useState(0); // keep track of current image index
+  const opacityStyle = {
+    opacity: opacityAnimation
   };
 
-  componentDidMount() {
-    this.startAnimation();
-  }
-
-  startAnimation = () => {
-    Animated.loop(
-      Animated.timing(this.state.animation, {
-        toValue: 2,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    ).start();
-  };
-
-  render() {
-    const { animation, percentage } = this.state;
-    const interpolateWave = animation.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg'],
+  useEffect(() => {
+    Animated.timing(opacityAnimation, {
+      toValue: reverseAnimation ? 0.0 : 0.8, // change direction of animation based on state
+      duration: 2000,
+      useNativeDriver: true
+    }).start(() => {
+      setReverseAnimation(!reverseAnimation); // toggle animation direction on completion
+      setImageIndex((imageIndex + 1) % images.length); // update image index
     });
-    const waveStyle = {
-      transform: [
-        {
-          rotate: interpolateWave,
-        },
-      ],
-    };
+  }, [opacityAnimation, reverseAnimation]);
 
-    return (
-      <View style={styles.container}>
-        <Animated.View style={[styles.wave, waveStyle]}>
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-        </Animated.View>
-        <Text style={styles.percentageText}>{percentage}</Text>
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.container}>
+      <Animated.Image
+        style={[styles.image, opacityStyle]}
+        source={images[imageIndex]} // use current image source
+      />
+      <Text style={styles.text}>{foodFacts[imageIndex]}</Text>
+
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#fff'
   },
-  wave: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 100
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#00ff00',
-    margin: 10,
-  },
-  percentageText: {
-    paddingTop: 15,
-    marginTop: 10,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00ff00',
-  },
+  text: {
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: 'bold'
+  }
 });
 
-export default WaveActivityIndicator;
+export default Loading;

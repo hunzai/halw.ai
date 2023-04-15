@@ -22,12 +22,6 @@ function Home() {
   const [apiError, setApiError] = useState(null);
   const navigation = useNavigation();
 
-  const showApiError = (message: string) => {
-    Alert.alert('Error', message, [{ text: 'OK', onPress: () => {} }], {
-      cancelable: false,
-    });
-  };
-
   useEffect(() => {
     if (textCompletion) {
       console.log(textCompletion);

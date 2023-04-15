@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import * as Speech from 'expo-speech';
+import { Ionicons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
+const iconSize = 25;
 
 const Narrator = ({ sentences }) => {
   const [index, setIndex] = useState(0);
@@ -32,73 +43,142 @@ const Narrator = ({ sentences }) => {
     setIndex(0);
   };
 
-  return (
-    <ImageBackground
-      source={require('../assets/spices.png')}
-      style={styles.container}
-    >
-      <View style={styles.buttonContainer}>
-        {sentences.map((sentence, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.button}
-            onPress={() => handlePlay()}
-          >
-            <Text style={styles.stopButtonText}>{index}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <TouchableOpacity style={styles.stopButton} onPress={() => handlePause()}>
-        <Text style={styles.stopButtonText}>Stop</Text>
+  const AudioPlayerButton = ({ sentence }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const handlePress = async () => {
+      setIsExpanded(!isExpanded);
+      await Speech.speak(sentence);
+    };
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.audioPlayerButton,
+          isExpanded && styles.audioPlayerButtonExpanded,
+        ]}
+        onPress={handlePress}
+      >
+        <View style={styles.row}>
+
+          <View style={styles.iconColumn}>
+            <Ionicons name="play-circle-outline" size={iconSize} style={styles.icon} />
+          </View>
+          <View style={styles.textColumn}>
+            <Text
+              style={[
+                styles.audioPlayerButtonText,
+                isExpanded && styles.audioPlayerButtonTextExpanded,
+              ]}
+              numberOfLines={1}
+            >
+              {sentence}
+            </Text>
+          </View>
+          <View style={styles.iconColumn}>
+            <Text style={styles.playAllButtonText}>{1}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
-    </ImageBackground>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.playAllButton} onPress={() => handlePlay()}>
+          <Ionicons name="play-circle-outline" size={iconSize * 2} color="white" style={styles.playAllButtonIcon} />
+          <Text style={styles.playAllButtonText}>Play All</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView>
+        <View style={styles.buttonContainer}>
+          {sentences.map((sentence, index) => (
+            <View style={styles.makeSpace} key={`view-${index}`}>
+              <AudioPlayerButton key={index} sentence={sentence} />
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  makeSpace: {
+    paddingBottom: 20,
+    paddingEnd: '15%',
+    alignContent: 'flex-end'
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    justifyContent: 'center',
+    padding: 20,
   },
-  buttonContainer: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    padding: 10,
+    width: '100%',
+    marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#333',
-    borderWidth: 2,
-    borderColor: '#6AFF6A',
-    borderRadius: 10,
-    padding: 20,
-    margin: 10,
+  iconColumn:{
+    paddingRight: 5,
   },
-  buttonText: {
-    color: '#6AFF6A',
+  playAllButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playAllButtonIcon: {
+    marginRight: 5,
+  },
+  playAllButtonText: {
+    color: 'white',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 16,
     textAlign: 'center',
   },
-  stopButton: {
-    backgroundColor: '#333',
-    borderWidth: 2,
-    borderColor: '#6AFF6A',
-    borderRadius: 10,
-    padding: 20,
-    marginTop: 50,
+  buttonContainer: {
+    width: '100%',
+    marginTop: 20,
   },
-  stopButtonText: {
-    color: '#6AFF6A',
+  audioPlayerButton: {
+    backgroundColor: '#eb8a3f',
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+
+  },
+  audioPlayerButtonText: {
+    color: '#0f0f0f',
     fontWeight: 'bold',
     fontSize: 20,
-    textAlign: 'center',
+    marginRight: 10,
   },
+  textColumn: {
+    paddingRight: 1
+  },
+  audioPlayerButtonExpanded: {
+    backgroundColor: '#F0F0F0',
+  },
+  audioPlayerButtonTextExpanded: {
+    color: '#4CAF50',
+  },
+  icon: {
+    position: 'relative',
+    color: '#10140b'
+  }
 });
 
 export default Narrator;
