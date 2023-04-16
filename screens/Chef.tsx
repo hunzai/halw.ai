@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator, Image, Text, Animated, Dimensions } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Image,
+  Text,
+  Animated,
+  Dimensions,
+} from 'react-native';
 import VoiceApi from '../api/VoiceApi';
 import Loading from '../components/Loading';
 import LocalStorage from '../utils/Storage';
 
-import Narrator from '../components/Narrator';
 import StoryTellerTheme from '../styles/StoryTellerStyle';
+import { Recipe } from '../api/Recipe';
+import Narrator from '../components/Narrator';
 
-const StoryTeller = () => {
+const Chef = () => {
   const waitingData = [
     'https://cdn.pixabay.com/photo/2023/03/25/10/59/hedgehog-fly-7875687_960_720.jpg',
     'https://cdn.pixabay.com/photo/2015/12/09/17/11/vegetables-1085063_640.jpg',
@@ -17,18 +26,31 @@ const StoryTeller = () => {
 
   const [animation] = useState(new Animated.Value(0));
   const voiceApi = new VoiceApi();
-  const sentences = [
-    "1. آدھی کلو چکن دھو کر کاٹ لیں۔",
-    "2. ایک پین میں دو کھانے کے چمچ زیتون کے تیل کو گرم کریں۔",
-    "3. اس میں ٹماٹر، پیاز، لہسن، ہری مرچ، نمک، لال مرچ، ہلدی، زیرہ اور کٹی ہوئی کاری پتہ ڈال کر چکن کو اس میں ملا کر ٹھوس کر لیں۔",
-    "4. اس میں چاول، دہی، پانی اور زردہ ڈال کر اچھی طرح مکس کر لیں۔",
-    "5. اب اسے دم دیں۔ اس کے لئے، اسے اوپر سے دھک کر ایک دم دینے کے لئے کم از کم 20 منٹ تک پکائیں۔",
-    "6. بریانی کے بیکنگ کے لئے ایک پین میں تیل گرم کریں اور اس میں کٹی ہوئی پیاز ڈال کر سونف، ہرا دھنیا، پودینہ، پیاز کے سلائس اور کشمیری لال مرچ ڈال کر 2 سے 3 منٹ تک پکائیں۔",
-    "7. اب اس میں چاول کے اوپر سے ٹوپیں بنائیں۔",
-    "8. پھر، ڈس پر بریانی کی لائے شامل کریں۔",
-    "9. کچھ دیر کے لئے ڈم دینے کے بعد، بریانی کو ڈھک کر اتار لیں۔",
-    "10. ہلدی، پیاز، لہسن، ہری مرچ اور نمک کے ساتھ سلاد کے ساتھ پیش کریں۔"
-  ]
+  const recipe : Recipe = {
+    recipe_name: 'Nutritious Chicken Biryani',
+    ingredients: [
+      '500g chicken pieces',
+      '2 cups rice',
+      '2 tbsp oil',
+      '1 large onion, thinly sliced',
+      '1 tbsp garam masala',
+      '1/2 cup yogurt',
+      '1/4 cup mint leaves',
+      'Salt, to taste',
+    ],
+    steps: [
+      'Step 1: Wash the rice thoroughly and soak it in water for 30 minutes. Drain and set aside.',
+      'Step 2: Heat oil in a large pot over medium heat. Add sliced onions and sauté until golden brown.',
+      'Step 3: Add chicken pieces to the pot and cook until they turn white.',
+      'Step 4: Add garam masala and yogurt to the pot. Mix well and let it cook for 5 minutes.',
+      'Step 5: Add soaked and drained rice to the pot. Mix gently with the chicken and spices.',
+      'Step 6: Add enough water to the pot to cover the rice by about 2 inches. Season with salt.',
+      'Step 7: Bring the mixture to a boil, then reduce the heat to low and cover the pot with a tight-fitting lid.',
+      'Step 8: Let the biryani cook on low heat for 20-25 minutes or until the rice and chicken are fully cooked.',
+      'Step 9: Once the biryani is cooked, turn off the heat and let it sit for 10 minutes.',
+      'Step 10: Garnish with mint leaves before serving. Serve hot and enjoy your delicious homemade chicken biryani!',
+    ],
+  };
 
   useEffect(() => {
     // Speech.getAvailableVoicesAsync().then(voices => {
@@ -67,9 +89,9 @@ const StoryTeller = () => {
               toValue: (index + 1) / waitingData.length,
               duration: 1000,
               useNativeDriver: true,
-            })
-          )
-        )
+            }),
+          ),
+        ),
       ).start();
     }
   }, [isLoading]);
@@ -77,17 +99,14 @@ const StoryTeller = () => {
   return (
     <View style={StoryTellerTheme.container}>
       {isLoading ? (
-        <Loading/>
+        <Loading />
       ) : (
         <View>
-          <Narrator sentences={sentences} />
+          <Narrator recipe={recipe} />
         </View>
-
       )}
     </View>
   );
 };
 
-
-
-export default StoryTeller;
+export default Chef;

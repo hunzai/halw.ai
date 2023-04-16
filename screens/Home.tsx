@@ -21,12 +21,12 @@ function Home() {
   const [promptSent, setPromptSent] = useState(false);
   const [apiError, setApiError] = useState(null);
   const navigation = useNavigation();
-
+  const NEXT_SCREEN_NAME='Chef'
   useEffect(() => {
     if (textCompletion) {
       console.log(textCompletion);
       LocalStorage.set(textCompletion);
-      navigation.navigate('StoryTeller');
+      navigation.navigate(NEXT_SCREEN_NAME);
     }
   }, [textCompletion]);
 

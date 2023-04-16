@@ -9,27 +9,37 @@ import {
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import { Ionicons } from '@expo/vector-icons';
+import { Recipe } from '../api/Recipe';
 
 const { width } = Dimensions.get('window');
 const iconSize = 25;
 
-const Narrator = ({ sentences }) => {
+const Narrator = ({ recipe }) => {
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const steps = recipe.steps;
+  const recipeName = recipe.recipe_name;
 
   useEffect(() => {
-    // Automatically play the first sentence when component is mounted
-    handlePlay();
-  }, []);
+    console.log(`is playing? ${isPlaying}`);
+  }, [isPlaying]);
 
-  const handlePlay = async () => {
-    if (index < sentences.length) {
-      await Speech.speak(sentences[index]);
+  const playSteps = async startIndex => {
+    if (startIndex < steps.length) {
+      await Speech.speak(steps[startIndex]);
       setIsPlaying(true);
-      setIndex(index + 1);
+      startIndex++;
+      setIndex(startIndex);
+      await playSteps(startIndex);
     } else {
       setIsPlaying(false);
+      setIndex(0);
     }
+  };
+
+  const handlePlayAll = async () => {
+    await playSteps(index);
   };
 
   const handlePause = async () => {
@@ -60,9 +70,12 @@ const Narrator = ({ sentences }) => {
         onPress={handlePress}
       >
         <View style={styles.row}>
-
           <View style={styles.iconColumn}>
-            <Ionicons name="play-circle-outline" size={iconSize} style={styles.icon} />
+            <Ionicons
+              name="play-circle-outline"
+              size={iconSize}
+              style={styles.icon}
+            />
           </View>
           <View style={styles.textColumn}>
             <Text
@@ -70,13 +83,13 @@ const Narrator = ({ sentences }) => {
                 styles.audioPlayerButtonText,
                 isExpanded && styles.audioPlayerButtonTextExpanded,
               ]}
-              numberOfLines={1}
+              numberOfLines={isExpanded ? undefined : 1}
             >
               {sentence}
             </Text>
           </View>
           <View style={styles.iconColumn}>
-            <Text style={styles.playAllButtonText}>{1}</Text>
+            <Text style={styles.playAllButtonText}></Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -85,15 +98,26 @@ const Narrator = ({ sentences }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{recipeName}</Text>
+      </View>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.playAllButton} onPress={() => handlePlay()}>
-          <Ionicons name="play-circle-outline" size={iconSize * 2} color="white" style={styles.playAllButtonIcon} />
+        <TouchableOpacity
+          style={styles.playAllButton}
+          onPress={() => handlePlayAll()}
+        >
+          <Ionicons
+            name="play-circle-outline"
+            size={iconSize * 1.5}
+            color="white"
+            style={styles.playAllButtonIcon}
+          />
           <Text style={styles.playAllButtonText}>Play All</Text>
         </TouchableOpacity>
       </View>
       <ScrollView>
         <View style={styles.buttonContainer}>
-          {sentences.map((sentence, index) => (
+          {steps.map((sentence, index) => (
             <View style={styles.makeSpace} key={`view-${index}`}>
               <AudioPlayerButton key={index} sentence={sentence} />
             </View>
@@ -108,7 +132,7 @@ const styles = StyleSheet.create({
   makeSpace: {
     paddingBottom: 20,
     paddingEnd: '15%',
-    alignContent: 'flex-end'
+    alignContent: 'flex-end',
   },
   row: {
     flexDirection: 'row',
@@ -121,21 +145,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  titleContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 20,
-  },
-  iconColumn:{
-    paddingRight: 5,
+    marginBottom: 10, // Reduced marginBottom
   },
   playAllButton: {
     backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25,
+    paddingVertical: 8, // Reduced padding
+    paddingHorizontal: 15, // Reduced padding
+    borderRadius: 20, // Reduced border radius
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -146,19 +178,23 @@ const styles = StyleSheet.create({
   playAllButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14, // Reduced font size
     textAlign: 'center',
   },
+
+  iconColumn: {
+    paddingRight: 5,
+  },
+
   buttonContainer: {
     width: '100%',
     marginTop: 20,
   },
   audioPlayerButton: {
-    backgroundColor: '#eb8a3f',
+    backgroundColor: '#fff',
     paddingVertical: 5,
     paddingHorizontal: 20,
     borderRadius: 25,
-
   },
   audioPlayerButtonText: {
     color: '#0f0f0f',
@@ -167,18 +203,19 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   textColumn: {
-    paddingRight: 1
+    paddingRight: 1,
   },
   audioPlayerButtonExpanded: {
     backgroundColor: '#F0F0F0',
   },
   audioPlayerButtonTextExpanded: {
-    color: '#4CAF50',
+    color: '#000',
+    fontSize: 14,
   },
   icon: {
     position: 'relative',
-    color: '#10140b'
-  }
+    color: '#10140b',
+  },
 });
 
 export default Narrator;

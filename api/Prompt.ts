@@ -19,7 +19,7 @@ class Prompter {
     "\nContext: Cooking food at home that is nutritious, cheaper and easy to prepare" +
     "\nTask: Write a recipe of chicken biryani that is traditional and tasty. Respons should be in two sections, first section will contain ingredients and then second will contain steps to prepare the Biryani" +
     "\nConstraints:  Make it simple and clear" +
-    '\nAdditional prompts: Create a response in a  json. The json should match the following json structure. { "ingredients": [], "steps": [] }';
+    '\nAdditional prompts: Create a response in a  json. The json should match the following json structure. { "receipe_name":"", "ingredients": [], "steps": [] }';
     return prompt
   }
 }

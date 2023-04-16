@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import Home from './screens/Home';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import StoryTeller from './screens/StoryTeller';
+import Chef from './screens/Chef';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,7 @@ const MyTheme = {
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
       <NavigationContainer theme={MyTheme}>
         <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
@@ -26,19 +27,20 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="StoryTeller"
-            component={StoryTeller}
+            name="Chef"
+            component={Chef}
             options={{ headerShown: false }}
           />
 
         </Stack.Navigator>
       </NavigationContainer>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 50
   },
 });

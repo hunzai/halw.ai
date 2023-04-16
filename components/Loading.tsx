@@ -29,7 +29,10 @@ const Loading = () => {
   }, [opacityAnimation, reverseAnimation]);
 
   return (
+    <View>
+
     <View style={styles.container}>
+    <Text style={styles.text2}>Building your recipe ...</Text>
       <Animated.Image
         style={[styles.image, opacityStyle]}
         source={images[imageIndex]} // use current image source
@@ -37,6 +40,8 @@ const Loading = () => {
       <Text style={styles.text}>{foodFacts[imageIndex]}</Text>
 
     </View>
+    </View>
+
   );
 };
 
@@ -56,6 +61,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold'
+  },
+  text2: {
+    marginTop: 20,
+    paddingBottom: 20,
+    fontSize: 18,
+    fontWeight: 'bold'
+
   }
 });
 
