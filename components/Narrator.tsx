@@ -10,15 +10,13 @@ import {
 import * as Speech from 'expo-speech';
 import { Ionicons } from '@expo/vector-icons';
 import narratorStyles from '../styles/NarratorTheme';
-import { PlayButton, PauseButton } from './PlayerButton';
+import  PauseButton  from './PlayerButton';
 import HalwaiButton from './Button';
 import Grid from './Grid';
 
-const iconSize = 25;
 
 const Narrator = ({ recipe }) => {
   const [index, setIndex] = useState(0);
-  const [rows, setRows] = useState([]);
 
   const [allStepsArePlayed, setIsPlaying] = useState(false);
   const steps = recipe.steps;
@@ -29,32 +27,33 @@ const Narrator = ({ recipe }) => {
     if (allStepsArePlayed) {
       stopPlaying();
     } else {
-      speak(index);
+      playStepAtIndex(index);
     }
   }, [allStepsArePlayed, index]);
 
   const speak = async index => {
+
+  };
+
+  const playStepAtIndex = async index => {
+    await Speech.stop();
     Speech.speak(steps[index], {
       language: 'en',
       onDone: () => {
         if (index < steps.length - 1) {
           setIndex(index + 1);
-          updateRows()
         } else {
-          // setIsPlaying(true);
+          setIsPlaying(true);
           setIndex(0);
         }
       },
     });
-  };
 
-  const playStepAtIndex = async index => {
-    await Speech.stop();
-    await speak(steps[index]);
   };
 
   const handlePlayAll = async () => {
     setIsPlaying(false);
+    setIndex(0);
     console.log(`current index handlePlayAll: ${index}`);
   };
 
@@ -67,31 +66,9 @@ const Narrator = ({ recipe }) => {
     await Speech.pause();
   };
 
-  const handlePress = async index => {
-    await playStepAtIndex(index);
-  };
+  const handlePress = () => {
+    console.log(`Button pressed: `);
 
-  const updateRows = () => {
-    const rows = [];
-
-    for (let i = 0; i < steps.length; i++) {
-      console.log(`button ${i}`);
-      const button1 =
-        index == i ? (
-          <PauseButton key={`pause-${i}`} onPress={() => handlePress(i)} text={i} />
-        ) : (
-          <PlayButton key={`play-${i}`} onPress={() => handlePress(i + 1)} text={i}/>
-        );
-
-      rows.push(
-        <View key={`btn-${i}`} style={styles.row}>
-          {button1}
-        </View>,
-      );
-    }
-
-    console.log(`length ${rows.length}`);
-    return rows;
   };
 
   return (
@@ -106,25 +83,12 @@ const Narrator = ({ recipe }) => {
 
       </View>
       <ScrollView>
-          <Grid buttons={updateRows()} />
+          <Grid steps={steps} index={index} onPress={handlePress}/>
       </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    flex: 1,
-    paddingHorizontal: 5,
-  },
-});
+
 
 export default Narrator;

@@ -1,37 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import PauseButton from './PlayerButton';
+import * as Speech from 'expo-speech';
 
-const Grid = ({ buttons }) => {
-
+const Grid = ({ steps, index, onPress }) => {
+  const [animatedIndex, setAnimatedIndex] = useState(0);
   const screenWidth = Dimensions.get('window').width;
   const numButtonsPerRow = Math.floor(screenWidth / 200);
-  const numRows = Math.ceil(buttons.length / numButtonsPerRow);
 
-  const rows = [];
-  let startIndex = 0;
+  useEffect(() => {
+    console.log(`${index} !== ${animatedIndex}`)
+  }, [index, animatedIndex]);
 
+  const playStepAtIndex = async index => {
+    await Speech.stop();
+    setAnimatedIndex(index)
+    await Speech.speak(steps[index]);
+  };
 
-  const showRows = () => {
-    for (let i = 0; i < numRows; i++) {
-      const endIndex = Math.min(startIndex + numButtonsPerRow, buttons.length);
-      const rowButtons = buttons.slice(startIndex, endIndex);
+  const renderButtons = () => {
+    const buttons = steps.map((_, i) => (
+      <PauseButton
+        key={`button-${i}`}
+        onPress={() => playStepAtIndex(i)}
+        text={i}
+        animating={animatedIndex === i}
+      />
+    ));
+
+    const rows = [];
+
+    for (let i = 0; i < buttons.length; i += numButtonsPerRow) {
+      const rowButtons = buttons.slice(i, i + numButtonsPerRow);
 
       rows.push(
         <View key={`row-${i}`} style={styles.row}>
           {rowButtons}
-        </View>,
+        </View>
       );
-      startIndex = endIndex;
     }
 
-    return <View style={styles.container}>{rows}</View>;
+    return rows;
   };
 
-  return  showRows() ;
+  return <View style={styles.container}>{renderButtons()}</View>;
 };
 
 const styles = StyleSheet.create({
@@ -42,12 +54,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonContainer: {
-    flex: 1,
-    paddingHorizontal: 5,
+    marginTop: 10,
   },
 });
-
 
 export default Grid;
