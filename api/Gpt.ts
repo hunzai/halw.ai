@@ -6,7 +6,7 @@ class GptApi {
 
   answer = async(prompt: string) => {
 
-    console.log(`requesting gpt : ${openApiKey}` )
+    // console.log(`requesting gpt : ${openApiKey}` )
     const requestBody: RequestBody = {
       model: 'text-davinci-003',
       prompt: prompt,
@@ -18,7 +18,7 @@ class GptApi {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${openApiKey}`,
+        Authorization: `Bearer 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`,
       },
       body: JSON.stringify(requestBody),
     });

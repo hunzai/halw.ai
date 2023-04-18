@@ -11,19 +11,19 @@ import {
 
 const iconSize = 25;
 
-const HalwaiButton = ({onPress: onPress, name: name}) => {
+const HalwaiButton = ({onPress: onPress, iconName: iconName}) => {
   return(
     <TouchableOpacity
     style={styles.playAllButton}
     onPress={onPress}
   >
     <Ionicons
-      name="play-circle-outline"
+      name={iconName}
       size={iconSize * 1}
       color="white"
       style={styles.playAllButtonIcon}
     />
-    <Text style={styles.playAllButtonText}>{name}</Text>
+    <Text style={styles.playAllButtonText}></Text>
   </TouchableOpacity>
   )
 }
@@ -33,14 +33,14 @@ export default HalwaiButton;
 const styles = StyleSheet.create({
 
   playAllButton: {
-    backgroundColor: '#4f5250',
+    backgroundColor: '#000',
     paddingVertical: 10,
     borderRadius: 10,
     width: '45%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   playAllButtonIcon: {
     marginRight: 5,

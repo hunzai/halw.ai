@@ -51,6 +51,8 @@ function Home({ navigation }) {
 
   const NEXT_SCREEN_NAME = 'Chef';
 
+
+
   useEffect(() => {
     if (gptResponse && promptSent) {
       navigation.navigate(NEXT_SCREEN_NAME, { recipe });
@@ -76,23 +78,65 @@ function Home({ navigation }) {
       });
   };
 
-  return (
+  const CustomButton = ({ title, onPress }) => (
+    <TouchableOpacity onPress={onPress} style={styles.customButton}>
+      <Text style={styles.customButtonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
+  const buttonData = [
+    { title: 'I am Vegan', onPress: () => {} },
+    { title: 'Meat Dishes', onPress: () => {} },
+    { title: 'What z in Fridge?', onPress: () => {} },
+    { title: 'Ask Wife', onPress: () => {} },
+  ];
+
+  const buttonsPerRow = 2;
+  const numRows = Math.ceil(buttonData.length / buttonsPerRow);
+
+  const renderButtonRows = () => {
+    const rows = [];
+    let index = 0;
+
+    for (let i = 0; i < numRows; i++) {
+      const rowButtons = buttonData.slice(index, index + buttonsPerRow).map((button) => (
+        <CustomButton key={button.title} title={button.title} onPress={button.onPress} />
+      ));
+
+      rows.push(
+        <View key={`row-${i}`} style={styles.buttonRow}>
+          {rowButtons}
+        </View>
+      );
+
+      index += buttonsPerRow;
+    }
+
+    return rows;
+  };
+
+ return (
     <View style={Theme.container}>
       {promptSent ? (
         <Loading />
       ) : (
         <ImageBackground
-          source={require('../assets/kitchen.png')}
+          source={require('../assets/kitchen.jpg')}
           style={Theme.background}
         >
+          
           <View style={Theme.container}>
-            <View style={Theme.inputContainer}>
+          {renderButtonRows()}
+
+            <View >
               <Text style={Theme.heading}>Halw.ai</Text>
 
               <TouchableOpacity style={Theme.button} onPress={sendGpt}>
                 <Text style={Theme.buttonText}>Let's Cook</Text>
               </TouchableOpacity>
             </View>
+
+       
 
             {apiError ? (
               <View style={Theme.inputContainer}>
@@ -108,4 +152,24 @@ function Home({ navigation }) {
   );
 }
 
+const styles = StyleSheet.create({
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 10,
+
+  },
+  customButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 25,
+    paddingVertical: 15,
+    borderRadius: 30,
+    elevation: 5,
+    marginHorizontal: 10,
+  },
+  customButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
 export default Home;

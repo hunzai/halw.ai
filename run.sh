@@ -1,1 +1,0 @@
-OPENAI_API_KEY="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" ELEVEN_LABS_KEY="3e017f8ccf18d7aa7dada5cd2b6123e5" npm run start

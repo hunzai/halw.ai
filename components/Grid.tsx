@@ -6,10 +6,9 @@ import * as Speech from 'expo-speech';
 const Grid = ({ steps, index, onPress }) => {
   const [animatedIndex, setAnimatedIndex] = useState(0);
   const screenWidth = Dimensions.get('window').width;
-  const numButtonsPerRow = Math.floor(screenWidth / 200);
+  const numButtonsPerRow = 2
 
   useEffect(() => {
-    console.log(`${index} !== ${animatedIndex}`)
   }, [index, animatedIndex]);
 
   const playStepAtIndex = async index => {

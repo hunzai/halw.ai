@@ -2,9 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const Theme = StyleSheet.create({
   colors: {
-    white: '#eeeee4',
-    black: '#21130d',
-    background: '#12230f'
+    color: '#fff'
   },
   background: {
     flex: 1,
@@ -43,7 +41,7 @@ const Theme = StyleSheet.create({
     opacity: 0.7
   },
   heading: {
-    color: '#4A4A4A',
+    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -67,6 +65,7 @@ const Theme = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     marginBottom: 16,
+    
   },
   buttonText: {
     color: '#FFFFFF',
